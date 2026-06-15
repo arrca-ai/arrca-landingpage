@@ -38,7 +38,7 @@ const patterns = [
 ];
 
 const mcpTools = [
-  ["search", "Find entities by keyword across IDs, names, metadata, and edge actions."],
+  ["search", "Find entities by keyword across IDs, names, metadata values, and edge actions."],
   ["get_entity", "Full detail for one entity: kind, metadata, and all outbound edges."],
   ["list_entities", "Enumerate every entity of a given kind."],
   ["get_subgraph", "Everything reachable from a root via BFS — blast radius / call neighborhood."],
@@ -131,7 +131,7 @@ service:
     <div class="mt-8 rounded-2xl border border-ink-100 bg-white p-6"><ArchDiagram /></div>
     <div class="mt-8 grid gap-6 lg:grid-cols-3">
       <div><h3 class="font-semibold text-ink-900">graph-k8s</h3><p class="mt-1 text-sm text-ink-500">Watches the Kubernetes API and writes structural entities + containment/management edges. Single writer.</p></div>
-      <div><h3 class="font-semibold text-ink-900">graph-otel</h3><p class="mt-1 text-sm text-ink-500">Consumes OTel trace spans and writes relationship entities + CALLS/QUERIES/PUBLISHES/EXPOSES edges.</p></div>
+      <div><h3 class="font-semibold text-ink-900">graph-otel</h3><p class="mt-1 text-sm text-ink-500">Consumes OTel trace spans and writes relationship entities + CALLS/QUERIES/PUBLISHES/CONSUMES/EXPOSES edges.</p></div>
       <div><h3 class="font-semibold text-ink-900">graph-read</h3><p class="mt-1 text-sm text-ink-500">Serves the read/query REST API and the MCP server.</p></div>
     </div>
     <div class="mt-8 rounded-2xl border border-gold-400 bg-gold-400/10 p-6">
