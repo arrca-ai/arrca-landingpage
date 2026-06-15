@@ -1,0 +1,36 @@
+---
+import Logo from "./Logo.astro";
+const links = [
+  { href: "/#reliability", label: "Reliability" },
+  { href: "/#onboarding", label: "Onboarding" },
+  { href: "/#mcp", label: "Claude / MCP" },
+  { href: "/#architecture", label: "How it works" },
+  { href: "/docs", label: "Docs" },
+];
+const GITHUB = "https://github.com/dhruva-upamanyu/otel-k8s-graph";
+---
+<header class="sticky top-0 z-50 border-b border-ink-100 bg-paper/80 backdrop-blur">
+  <nav class="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
+    <a href="/" aria-label="arrca home"><Logo /></a>
+    <div class="hidden items-center gap-6 md:flex">
+      {links.map((l) => (
+        <a href={l.href} class="text-sm font-medium text-ink-500 hover:text-ink-900">{l.label}</a>
+      ))}
+      <a href={GITHUB} class="text-sm font-medium text-ink-500 hover:text-ink-900">GitHub</a>
+      <a href="/#quickstart" class="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-500">Quickstart</a>
+    </div>
+    <button id="navToggle" class="md:hidden" aria-label="Toggle menu">
+      <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </nav>
+  <div id="mobileMenu" class="hidden flex-col gap-1 border-t border-ink-100 px-5 py-3 md:hidden">
+    {links.map((l) => (<a href={l.href} class="py-2 text-sm font-medium text-ink-500">{l.label}</a>))}
+    <a href={GITHUB} class="py-2 text-sm font-medium text-ink-500">GitHub</a>
+    <a href="/#quickstart" class="py-2 text-sm font-semibold text-teal-600">Quickstart</a>
+  </div>
+</header>
+<script>
+  const t = document.getElementById("navToggle");
+  const m = document.getElementById("mobileMenu");
+  t?.addEventListener("click", () => m?.classList.toggle("hidden"));
+</script>

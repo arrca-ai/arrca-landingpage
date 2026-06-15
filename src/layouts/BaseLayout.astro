@@ -1,0 +1,28 @@
+---
+import "../styles/global.css";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+interface Props { title?: string; description?: string; }
+const {
+  title = "arrca — X marks the root cause",
+  description = "A live relationship graph of your Kubernetes cluster, built from read-only APIs and the traces you already emit.",
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+  </head>
+  <body class="min-h-screen bg-paper text-ink-800">
+    <Nav />
+    <main><slot /></main>
+    <Footer />
+  </body>
+</html>
