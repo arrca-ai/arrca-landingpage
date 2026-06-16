@@ -178,11 +178,11 @@ service:
   <!-- 06 · Quickstart -->
   <Section id="quickstart" index="06" eyebrow="Quickstart" title="Two steps to a live graph.">
     <div class="mt-11 grid gap-7 md:grid-cols-2">
-      <div>
+      <div class="min-w-0">
         <p class="mb-3.5 text-sm font-semibold text-ink-900"><span class="font-mono text-teal-600">1</span> &nbsp;Install the chart (bundles Redis)</p>
         <CodeBlock title="install"><Fragment set:text={codeInstall} /></CodeBlock>
       </div>
-      <div>
+      <div class="min-w-0">
         <p class="mb-3.5 text-sm font-semibold text-ink-900"><span class="font-mono text-teal-600">2</span> &nbsp;Fan trace spans to graph-otel</p>
         <CodeBlock title="otel-collector-values.yaml"><Fragment set:text={codeOtelCollector} /></CodeBlock>
       </div>
