@@ -124,7 +124,7 @@ const mcpTools = [
   ["get_flow", "The full canonical structure of one trace flow by root hash."],
 ];
 
-const entityKinds = "namespace, node, zone, region, deployment, statefulset, daemonset, job, cronjob, rollout, pod, container, hpa, scaledobject (from the Kubernetes API); endpoint, topic, database (from trace spans).";
+const entityKinds = "namespace, node, zone, region, deployment, statefulset, daemonset, job, cronjob, rollout (Argo Rollouts), pod, container, hpa, scaledobject (KEDA) — all from the Kubernetes API; endpoint, topic, database — from trace spans.";
 const edgeKinds = "CONTAINS/RUNS_IN, MANAGES/MANAGED_BY, SCALES/SCALED_BY (K8s derived); EXPOSES/EXPOSED_BY, CALLS/CALLED_BY, PUBLISHES/PUBLISHED_BY, CONSUMES/CONSUMED_BY, QUERIES/QUERIED_BY (span derived). QUERIES edges carry an action (the SQL/command).";
 const idForms = [
   ["pod:<ns>/<name>", "a pod"],
