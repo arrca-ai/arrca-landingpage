@@ -3,7 +3,7 @@
 Marketing + docs site for **arrca** (arrca.ai), built with Astro + Tailwind.
 This is a standalone repo; the Astro site is at the repo root. arrca is the
 brand for root-cause-analysis tooling; the flagship tool featured here is
-[otel-k8s-graph](https://github.com/dhruva-upamanyu/otel-k8s-graph).
+[otel-k8s-graph](https://github.com/arrca-ai/otel-k8s-graph).
 
 ## Develop
 
