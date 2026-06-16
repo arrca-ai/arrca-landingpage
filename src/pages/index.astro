@@ -170,7 +170,7 @@ service:
         <li class="text-sm leading-[1.55] text-[#aab9c5]">Reads only — arrca never writes to your cluster. graph-k8s uses read-only Kubernetes APIs.</li>
         <li class="text-sm leading-[1.55] text-[#aab9c5]">Trace spans carry <code class="font-mono text-[12.5px] text-paper">k8s.*</code> attributes so relationships attach to the right container.</li>
         <li class="text-sm leading-[1.55] text-[#aab9c5]">graph-otel consumes trace spans directly — no spanmetrics connector or metrics pipeline required.</li>
-        <li class="text-sm leading-[1.55] text-[#aab9c5]">Argo Rollouts and KEDA are optional CRDs; if absent, graph-k8s skips them, so it runs anywhere.</li>
+        <li class="text-sm leading-[1.55] text-[#aab9c5]">Argo Rollouts and KEDA CRDs are modelled natively alongside core workloads and autoscalers — and arrca runs fine on clusters without them.</li>
       </ul>
     </div>
   </Section>
