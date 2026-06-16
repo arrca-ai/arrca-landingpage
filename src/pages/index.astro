@@ -2,36 +2,37 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Hero from "../components/Hero.astro";
 import Section from "../components/Section.astro";
-import PatternCard from "../components/PatternCard.astro";
+import PatternRow from "../components/PatternRow.astro";
 import ArchDiagram from "../components/ArchDiagram.astro";
 import CodeBlock from "../components/CodeBlock.astro";
 
 // Reliability patterns — each maps to real graph/MCP traversals (no invented detectors).
+// `problem` may contain inline HTML.
 const patterns = [
   {
-    title: "Single points of failure",
-    problem: "One service that nearly everything calls. If it falls, the fleet falls. Find the nodes with the heaviest CALLED_BY fan-in.",
-    query: "get_entity → count CALLED_BY edges",
+    name: "Single points of failure",
+    problem: `One service that nearly everything calls. If it falls, the fleet falls — find the nodes with the heaviest <code class="font-mono text-[12.5px] text-ink-900">CALLED_BY</code> fan-in.`,
+    query: "get_entity → count CALLED_BY",
   },
   {
-    title: "Large fan-outs",
-    problem: "A request that triggers a cascade of downstream calls — latency and failure amplifiers. Spot nodes with many outbound CALLS edges.",
-    query: "get_entity → count CALLS edges",
+    name: "Large fan-outs",
+    problem: `A request that triggers a cascade of downstream calls — a latency and failure amplifier. Spot nodes with many outbound <code class="font-mono text-[12.5px] text-ink-900">CALLS</code> edges.`,
+    query: "get_entity → count CALLS",
   },
   {
-    title: "Cyclical dependencies",
-    problem: "A calls B calls C calls A. Cycles make deploys and failures hard to reason about. Detect loops across CALLS edges and flow trees.",
+    name: "Cyclical dependencies",
+    problem: `A calls B calls C calls A. Cycles make deploys and failures hard to reason about. Detect loops across calls and flow trees.`,
     query: "get_subgraph + list_flows",
   },
   {
-    title: "Downstream depth & blast radius",
-    problem: "Before you touch a service, see everything reachable from it. BFS the graph to bound the blast radius of a change.",
+    name: "Blast radius",
+    problem: `Before you touch a service, see everything reachable from it. BFS the graph to bound the impact of a change.`,
     query: "get_subgraph(id, max_depth)",
   },
   {
-    title: "Dead code",
-    problem: "Endpoints that are EXPOSED but have no callers — safe to deprecate. Walk every endpoint and find the ones with zero CALLED_BY.",
-    query: "list_entities(endpoint) → no callers",
+    name: "Dead code",
+    problem: `Endpoints that are exposed but have no callers — safe to deprecate. Walk every endpoint and find the ones with zero <code class="font-mono text-[12.5px] text-ink-900">CALLED_BY</code>.`,
+    query: "list_entities → no callers",
   },
 ];
 
@@ -39,22 +40,18 @@ const mcpTools = [
   ["search", "Find entities by keyword across IDs, names, metadata values, and edge actions."],
   ["get_entity", "Full detail for one entity: kind, metadata, and all outbound edges."],
   ["list_entities", "Enumerate every entity of a given kind."],
-  ["get_subgraph", "Everything reachable from a root via BFS — blast radius / call neighborhood."],
+  ["get_subgraph", "Everything reachable from a root via BFS — the blast radius."],
   ["list_flows", "Distinct request shapes collapsed from many traces."],
   ["get_flow", "The full canonical structure of one trace flow."],
 ];
-
-const codeAskClaude = `> Which services would be impacted if I take down auth-service?
-
-Claude uses get_subgraph(deployment:prod/auth-service) and reports the
-downstream blast radius: 7 deployments, 2 databases, 1 kafka topic.`;
 
 const codeInstall = `REGISTRY=<your-registry> ./deploy.sh`;
 
 const codeOtelCollector = `exporters:
   otlp/graph:
     endpoint: graph-otel-otlp.default.svc.cluster.local:4317
-    tls: { insecure: true }
+    tls:
+      insecure: true
 service:
   pipelines:
     traces:
@@ -63,109 +60,133 @@ service:
 <BaseLayout>
   <Hero />
 
-  <Section id="what" eyebrow="What it is" title="Your cluster, as one queryable graph">
-    <div class="mt-6 grid gap-8 lg:grid-cols-2">
-      <p class="text-lg text-ink-500">
-        A microservices topology is fragmented: some structural relationships live in Kubernetes,
-        others exist only in telemetry. arrca unifies both read-only sources into a single graph
-        engineers can actually explore — no <code class="font-mono text-ink-800">kubectl</code>
+  <!-- 01 · What it is -->
+  <Section id="what" index="01" eyebrow="What it is" title="Your cluster, as one queryable graph.">
+    <div class="mt-10 grid items-start gap-14 md:grid-cols-2">
+      <p class="text-[17px] leading-[1.65] text-ink-500">
+        A microservices topology is fragmented — some relationships live in Kubernetes, others
+        exist only in telemetry. arrca unifies both read-only sources into a single graph engineers
+        can actually explore. No <code class="font-mono text-[14px] text-ink-900">kubectl</code>
         incantations, no RBAC barriers, no guessing which dashboard holds what.
-        <strong class="text-ink-800">Cluster structure</strong> comes from the Kubernetes API
-        (namespaces, nodes, zones, workloads, pods, containers, autoscalers);
-        <strong class="text-ink-800">service relationships</strong> come from your OpenTelemetry trace
-        spans (who calls which endpoint, queries which database, publishes to which topic).
       </p>
-      <p class="text-lg text-ink-500">
-        The result answers questions a dashboard can't: <em>"what pods still call <code class="font-mono text-ink-800">/v1/checkout</code> — can I deprecate it?"</em>,
-        <em>"how many services are impacted if I change this deployment?"</em>,
-        <em>"which services talk to the mysql database at 10.0.0.0?"</em> — over REST, or straight from Claude.
-      </p>
+      <div class="overflow-hidden rounded-2xl border border-ink-150">
+        <div class="grid grid-cols-[auto_1fr] gap-[18px] border-b border-ink-100 px-5 py-[18px]">
+          <span class="font-mono text-[13px] font-medium text-ink-900">Kubernetes API</span>
+          <span class="text-[13.5px] text-ink-600">namespaces, nodes, zones, workloads, pods, containers <span class="text-teal-600">— structure</span></span>
+        </div>
+        <div class="grid grid-cols-[auto_1fr] gap-[18px] border-b border-ink-100 px-5 py-[18px]">
+          <span class="font-mono text-[13px] font-medium text-ink-900">OTel spans</span>
+          <span class="text-[13.5px] text-ink-600">who calls which endpoint, queries which db, publishes to which topic <span class="text-teal-600">— relationships</span></span>
+        </div>
+        <div class="flex items-center gap-3 bg-ink-50 px-5 py-4">
+          <span class="font-mono text-xs text-ink-400">&#8595;</span>
+          <span class="text-sm font-semibold text-ink-900">one graph — explorable over REST, or straight from Claude</span>
+        </div>
+      </div>
     </div>
   </Section>
 
-  <Section id="reliability" eyebrow="For Platform & SRE teams" title="Find the structural risks hiding in your microservices" class="bg-ink-50 rounded-3xl">
-    <p class="mt-4 max-w-2xl text-lg text-ink-500">
-      The graph makes microservice anti-patterns answerable as queries. Ask them yourself over REST,
-      or let Claude walk the graph for you.
+  <!-- 02 · Reliability ledger -->
+  <Section id="reliability" index="02" eyebrow="For platform & SRE teams" title="The structural risks hiding in your services." class="border-y border-ink-100 bg-ink-50">
+    <p class="mt-4 max-w-[54ch] text-[17px] leading-[1.65] text-ink-500">
+      Microservice anti-patterns become queries. Ask them yourself over REST, or let Claude walk
+      the graph for you.
     </p>
-    <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {patterns.map((p) => <PatternCard title={p.title} problem={p.problem} query={p.query} />)}
+    <div class="mt-11">
+      <div class="grid grid-cols-1 gap-3 px-1 py-3 font-mono text-[10.5px] uppercase tracking-[0.12em] text-ink-400 sm:grid-cols-[0.9fr_1.5fr_0.9fr] sm:gap-7">
+        <span>Pattern</span><span>What to look for</span><span>Traversal</span>
+      </div>
+      {patterns.map((p, i) => (
+        <PatternRow name={p.name} problem={p.problem} query={p.query} first={i === 0} />
+      ))}
+      <div class="border-t border-ink-200"></div>
     </div>
   </Section>
 
-  <Section id="onboarding" eyebrow="For developers" title="Explore the real topology — no RBAC battle">
-    <div class="mt-6 grid gap-8 lg:grid-cols-2">
-      <p class="text-lg text-ink-500">
+  <!-- onboarding anchor target (kept for nav) -->
+  <Section id="onboarding" index="03" eyebrow="For developers" title="Explore the real topology — no RBAC battle.">
+    <div class="mt-10 grid gap-14 md:grid-cols-2">
+      <p class="text-[17px] leading-[1.65] text-ink-500">
         New engineers shouldn't need cluster-admin to understand how the system fits together. Every
-        node and edge in arrca is aggregated from <strong class="text-ink-800">read-only Kubernetes APIs</strong>
-        and <strong class="text-ink-800">telemetry</strong> — no secrets, no write access, nothing sensitive.
-        It's a safe map of production you can hand to anyone on day one.
+        node and edge is aggregated from <strong class="font-semibold text-ink-900">read-only
+        Kubernetes APIs</strong> and <strong class="font-semibold text-ink-900">telemetry</strong> —
+        no secrets, no write access, nothing sensitive. A safe map of production you can hand to
+        anyone on day one.
       </p>
-      <p class="text-lg text-ink-500">
-        Walk from a deployment to the endpoints it serves, the databases it queries, the zones it runs
-        in, and the services that depend on it — without ever touching a live resource.
+      <p class="text-[17px] leading-[1.65] text-ink-500">
+        Walk from a deployment to the endpoints it serves, the databases it queries, the zones it
+        runs in, and the services that depend on it — without ever touching a live resource.
       </p>
     </div>
   </Section>
 
-  <Section id="mcp" eyebrow="Natively integrated" title="Built for Claude Code, out of the box">
-    <p class="mt-4 max-w-2xl text-lg text-ink-500">
-      <code class="font-mono text-ink-800">graph-read mcp</code> is a Model Context Protocol server.
-      Point Claude Code (or Claude Desktop) at it and the model can reason over your live topology to
-      make better decisions — reviewing a PR, planning a migration, or running an incident.
+  <!-- 04 · MCP -->
+  <Section id="mcp" index="04" eyebrow="Natively integrated" title="Built for Claude Code, out of the box." class="border-t border-ink-100">
+    <p class="mt-4 max-w-[56ch] text-[17px] leading-[1.65] text-ink-500">
+      <code class="font-mono text-[14.5px] text-ink-900">graph-read mcp</code> is a Model Context
+      Protocol server. Point Claude at it and the model reasons over your live topology — reviewing
+      a PR, planning a migration, or running an incident.
     </p>
-    <div class="mt-8 grid gap-8 lg:grid-cols-2">
-      <ul class="space-y-3">
+    <div class="mt-11 grid items-start gap-14 md:grid-cols-2">
+      <div class="border-t border-ink-150">
         {mcpTools.map(([name, desc]) => (
-          <li class="flex gap-3">
-            <code class="font-mono text-sm font-semibold text-teal-600">{name}</code>
-            <span class="text-sm text-ink-500">{desc}</span>
-          </li>
+          <div class="grid grid-cols-[130px_1fr] gap-5 border-b border-ink-100 px-0.5 py-[15px]">
+            <span class="font-mono text-[13px] font-medium text-teal-600">{name}</span>
+            <span class="text-[13.5px] leading-[1.5] text-ink-600">{desc}</span>
+          </div>
         ))}
-      </ul>
-      <CodeBlock title="ask Claude"><Fragment set:text={codeAskClaude} /></CodeBlock>
+      </div>
+      <div class="overflow-hidden rounded-2xl border border-night-line bg-night">
+        <div class="border-b border-white/10 px-[18px] py-3.5 font-mono text-[12px] text-[#9fb0bd]">ask claude</div>
+        <div class="px-5 py-[22px] font-mono text-[13px] leading-[1.75]">
+          <div class="text-teal-400">&gt; Which services break if I take<br />&nbsp;&nbsp;down auth-service?</div>
+          <div class="mt-3.5 text-[#aab9c5]">Claude calls <span class="text-paper">get_subgraph(prod/auth-service)</span> and reports the downstream blast radius:</div>
+          <div class="mt-3 text-paper">&nbsp;&nbsp;<span class="text-teal-400">7</span> deployments<br />&nbsp;&nbsp;<span class="text-teal-400">2</span> databases<br />&nbsp;&nbsp;<span class="text-gold-400">1</span> kafka topic</div>
+        </div>
+      </div>
     </div>
   </Section>
 
-  <Section id="architecture" eyebrow="How it works" title="Three small binaries, coordinating through Redis">
-    <div class="mt-8 rounded-2xl border border-ink-100 bg-white p-6"><ArchDiagram /></div>
-    <div class="mt-8 grid gap-6 lg:grid-cols-3">
-      <div><h3 class="font-semibold text-ink-900">graph-k8s</h3><p class="mt-1 text-sm text-ink-500">Watches the Kubernetes API and writes structural entities + containment/management edges. Single writer.</p></div>
-      <div><h3 class="font-semibold text-ink-900">graph-otel</h3><p class="mt-1 text-sm text-ink-500">Consumes OTel trace spans and writes relationship entities + CALLS/QUERIES/PUBLISHES/CONSUMES/EXPOSES edges.</p></div>
-      <div><h3 class="font-semibold text-ink-900">graph-read</h3><p class="mt-1 text-sm text-ink-500">Serves the read/query REST API and the MCP server.</p></div>
-    </div>
-    <div class="mt-8 rounded-2xl border border-gold-400 bg-gold-400/10 p-6">
-      <h3 class="font-semibold text-ink-900">Assumptions</h3>
-      <ul class="mt-3 list-disc space-y-1 pl-5 text-sm text-ink-500">
-        <li>Reads only — arrca never writes to your cluster. graph-k8s uses read-only Kubernetes APIs.</li>
-        <li>Trace spans must carry <code class="font-mono">k8s.*</code> attributes (the collector's <code class="font-mono">k8sattributes</code> processor adds them) so relationships attach to the right container.</li>
-        <li>graph-otel consumes <strong>trace spans directly</strong> — no spanmetrics connector or metrics pipeline required.</li>
-        <li>Argo Rollouts and KEDA are CRDs; if they're absent, graph-k8s detects it and skips them, so it runs anywhere.</li>
-      </ul>
-    </div>
-  </Section>
-
-  <Section id="quickstart" eyebrow="Quickstart" title="Two steps to a live graph">
-    <div class="mt-8 grid gap-6 lg:grid-cols-2">
+  <!-- 05 · Architecture (dark) -->
+  <Section id="architecture" index="05" eyebrow="How it works" title="Three small binaries, coordinating through Redis." dark class="bg-night">
+    <div class="mt-12 mb-12"><ArchDiagram /></div>
+    <div class="mb-14 grid gap-9 md:grid-cols-3">
       <div>
-        <p class="mb-3 text-sm font-semibold text-ink-800">1. Install the chart (bundles Redis):</p>
+        <h3 class="mb-2 text-[15px] font-semibold text-paper">graph-k8s</h3>
+        <p class="text-[13.5px] leading-[1.6] text-[#9fb0bd]">Watches the Kubernetes API and writes structural entities plus containment / management edges. Single writer.</p>
+      </div>
+      <div>
+        <h3 class="mb-2 text-[15px] font-semibold text-paper">graph-otel</h3>
+        <p class="text-[13.5px] leading-[1.6] text-[#9fb0bd]">Consumes OTel trace spans and writes relationship entities plus CALLS / QUERIES / PUBLISHES / CONSUMES / EXPOSES edges.</p>
+      </div>
+      <div>
+        <h3 class="mb-2 text-[15px] font-semibold text-paper">graph-read</h3>
+        <p class="text-[13.5px] leading-[1.6] text-[#9fb0bd]">Serves the read / query REST API and the MCP server.</p>
+      </div>
+    </div>
+    <div class="border-l-2 border-teal-400 py-1 pl-6">
+      <div class="mb-4 font-mono text-[11.5px] uppercase tracking-[0.14em] text-[#7f93a1]">Assumptions</div>
+      <ul class="flex list-none flex-col gap-2.5 p-0">
+        <li class="text-sm leading-[1.55] text-[#aab9c5]">Reads only — arrca never writes to your cluster. graph-k8s uses read-only Kubernetes APIs.</li>
+        <li class="text-sm leading-[1.55] text-[#aab9c5]">Trace spans carry <code class="font-mono text-[12.5px] text-paper">k8s.*</code> attributes so relationships attach to the right container.</li>
+        <li class="text-sm leading-[1.55] text-[#aab9c5]">graph-otel consumes trace spans directly — no spanmetrics connector or metrics pipeline required.</li>
+        <li class="text-sm leading-[1.55] text-[#aab9c5]">Argo Rollouts and KEDA are optional CRDs; if absent, graph-k8s skips them, so it runs anywhere.</li>
+      </ul>
+    </div>
+  </Section>
+
+  <!-- 06 · Quickstart -->
+  <Section id="quickstart" index="06" eyebrow="Quickstart" title="Two steps to a live graph.">
+    <div class="mt-11 grid gap-7 md:grid-cols-2">
+      <div>
+        <p class="mb-3.5 text-sm font-semibold text-ink-900"><span class="font-mono text-teal-600">1</span> &nbsp;Install the chart (bundles Redis)</p>
         <CodeBlock title="install"><Fragment set:text={codeInstall} /></CodeBlock>
       </div>
       <div>
-        <p class="mb-3 text-sm font-semibold text-ink-800">2. Fan trace spans to graph-otel:</p>
+        <p class="mb-3.5 text-sm font-semibold text-ink-900"><span class="font-mono text-teal-600">2</span> &nbsp;Fan trace spans to graph-otel</p>
         <CodeBlock title="otel-collector-values.yaml"><Fragment set:text={codeOtelCollector} /></CodeBlock>
       </div>
     </div>
-    <a href="/docs" class="mt-8 inline-block font-semibold text-teal-600 hover:text-teal-500">Full docs, every knob →</a>
-  </Section>
-
-  <Section id="demo" eyebrow="Demo" title="See it on a real system">
-    <div class="mt-6 flex flex-col items-start gap-3 rounded-2xl border border-dashed border-ink-200 bg-white p-8">
-      <span class="rounded-full bg-gold-400/20 px-3 py-1 text-xs font-semibold text-gold-500">Coming soon</span>
-      <p class="text-lg text-ink-500">
-        A live walkthrough on the <a href="https://github.com/open-telemetry/opentelemetry-demo" class="text-teal-600 underline">OpenTelemetry Astronomy Shop</a> —
-        the graph, the patterns, and Claude navigating it end to end.
-      </p>
-    </div>
+    <a href="/docs" class="mt-9 inline-flex items-center gap-2 text-[15px] font-semibold text-teal-600 hover:text-teal-500">Full docs, every knob <span>&#8594;</span></a>
   </Section>
 </BaseLayout>

@@ -1,38 +1,56 @@
 @import "tailwindcss";
 
-@import "@fontsource/inter/400.css";
-@import "@fontsource/inter/500.css";
-@import "@fontsource/inter/600.css";
-@import "@fontsource/inter/700.css";
+@import "@fontsource/space-grotesk/400.css";
+@import "@fontsource/space-grotesk/500.css";
+@import "@fontsource/space-grotesk/600.css";
+@import "@fontsource/space-grotesk/700.css";
 @import "@fontsource/jetbrains-mono/400.css";
 @import "@fontsource/jetbrains-mono/500.css";
 
-/* arrca design tokens */
+/* arrca design tokens — engineering-spec minimalism */
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  /* ink/navy text, teal/aqua primary, warm gold secondary */
-  --color-ink-50: #f5f7fa;
-  --color-ink-100: #e6ebf2;
-  --color-ink-200: #c9d2de;
-  --color-ink-500: #4a5a72;
+  --color-paper: #fbfcfd;
+
+  /* cool ink ramp */
+  --color-ink-50: #f6f8f9;   /* panel fill */
+  --color-ink-100: #eef1f3;  /* faint hairline */
+  --color-ink-150: #e7ebee;  /* default hairline / border */
+  --color-ink-200: #dde4e9;  /* stronger hairline */
+  --color-ink-400: #8593a0;  /* mono labels */
+  --color-ink-500: #51616f;  /* body copy */
+  --color-ink-600: #6b7888;  /* muted descriptions */
   --color-ink-800: #1c2738;
-  --color-ink-900: #0f1825;
+  --color-ink-900: #11202e;  /* headings */
 
-  --color-teal-400: #2dd4bf;
-  --color-teal-500: #14b8a6;
-  --color-teal-600: #0d9488;
+  /* single accent */
+  --color-teal-400: #14b8a6; /* bright */
+  --color-teal-500: #0fa595;
+  --color-teal-600: #0d9488; /* base */
 
-  --color-gold-400: #f5c451;
+  /* logo-only warm */
+  --color-gold-400: #f2bb45;
   --color-gold-500: #e3a008;
 
-  --color-paper: #fbfcfe;
+  /* dark sections + code */
+  --color-night: #0f1c28;
+  --color-night-2: #13283a;
+  --color-night-line: #1c3040;
+  --color-night-edge: #33485a;
 }
 
 html {
   scroll-behavior: smooth;
   font-family: var(--font-sans);
-  color: var(--color-ink-800);
+  color: var(--color-ink-900);
   background: var(--color-paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-teal-400);
+  color: #fff;
 }

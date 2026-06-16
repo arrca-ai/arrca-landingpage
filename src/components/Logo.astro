@@ -2,26 +2,26 @@
 interface Props {
   variant?: "full" | "mark";
   class?: string;
-  /** Tailwind sizing classes for the mascot image (default: nav size). */
+  /** Tailwind sizing classes for the emblem (default: nav size). */
   imgClass?: string;
 }
 const {
   variant = "full",
   class: klass = "",
-  imgClass = "h-11 w-11",
+  imgClass = "h-7 w-7",
 } = Astro.props;
 ---
-<span class={`inline-flex items-center gap-2 ${klass}`}>
+<span class={`inline-flex items-center gap-2.5 ${klass}`}>
   <img
     src="/arrca-emblem.svg"
     alt="arrca"
-    width="240"
-    height="240"
+    width="512"
+    height="512"
     class={`${imgClass} shrink-0 select-none`}
     loading="eager"
     decoding="async"
   />
   {variant === "full" && (
-    <span class="text-2xl font-bold tracking-tight text-ink-900">arrca</span>
+    <span class="text-[19px] font-bold tracking-tight text-ink-900">arrca</span>
   )}
 </span>
