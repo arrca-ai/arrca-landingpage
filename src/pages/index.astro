@@ -72,23 +72,24 @@ service:
   <Section id="what" index="01" eyebrow="What it is" title="Your cluster, as one queryable graph.">
     <div class="mt-10 grid items-start gap-14 md:grid-cols-2">
       <p class="text-[17px] leading-[1.65] text-ink-500">
-        A microservices topology is fragmented — some relationships live in Kubernetes, others
-        exist only in telemetry. arrca unifies both read-only sources into a single graph engineers
-        can actually explore. No <code class="font-mono text-[14px] text-ink-900">kubectl</code>
+        A microservices topology is scattered across two sources — the Kubernetes API and your
+        telemetry — and neither shows the whole picture. arrca reads both into a single graph of
+        <strong class="font-semibold text-ink-900">entities and the relationships between them</strong>,
+        that engineers can actually explore. No <code class="font-mono text-[14px] text-ink-900">kubectl</code>
         incantations, no RBAC barriers, no guessing which dashboard holds what.
       </p>
       <div class="overflow-hidden rounded-2xl border border-ink-150">
         <div class="grid grid-cols-[auto_1fr] gap-[18px] border-b border-ink-100 px-5 py-[18px]">
           <span class="font-mono text-[13px] font-medium text-ink-900">Kubernetes API</span>
-          <span class="text-[13.5px] text-ink-600">namespaces, nodes, zones, workloads, pods, containers <span class="text-teal-600">— structure</span></span>
+          <span class="text-[13.5px] text-ink-600">nodes, zones, workloads, pods, containers — and how they contain, manage &amp; scale each other <span class="text-teal-600">— cluster topology</span></span>
         </div>
         <div class="grid grid-cols-[auto_1fr] gap-[18px] border-b border-ink-100 px-5 py-[18px]">
           <span class="font-mono text-[13px] font-medium text-ink-900">OTel spans</span>
-          <span class="text-[13.5px] text-ink-600">who calls which endpoint, queries which db, publishes to which topic <span class="text-teal-600">— relationships</span></span>
+          <span class="text-[13.5px] text-ink-600">endpoints, topics, databases — and who calls, queries &amp; publishes to what <span class="text-teal-600">— service interactions</span></span>
         </div>
         <div class="flex items-center gap-3 bg-ink-50 px-5 py-4">
           <span class="font-mono text-xs text-ink-400">&#8595;</span>
-          <span class="text-sm font-semibold text-ink-900">one graph — explorable over REST, or straight from Claude</span>
+          <span class="text-sm font-semibold text-ink-900">one graph of entities + edges — over REST, or straight from Claude</span>
         </div>
       </div>
     </div>

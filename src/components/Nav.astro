@@ -28,7 +28,7 @@ const EMAIL = "mailto:dhruvaupamanyu93@gmail.com";
       <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
   </nav>
-  <div id="mobileMenu" class="hidden flex-col gap-1 border-t border-ink-150 px-8 py-3 md:hidden">
+  <div id="mobileMenu" class="hidden flex-col gap-1 border-t border-ink-150 bg-paper px-8 py-3 md:!hidden">
     {links.map((l) => (<a href={l.href} class="py-2 text-sm text-ink-500">{l.label}</a>))}
     <a href={EMAIL} class="py-2 text-sm text-ink-500">Contact</a>
     <a href={GITHUB} class="py-2 text-sm text-ink-500">GitHub</a>
@@ -38,5 +38,8 @@ const EMAIL = "mailto:dhruvaupamanyu93@gmail.com";
 <script>
   const t = document.getElementById("navToggle");
   const m = document.getElementById("mobileMenu");
-  t?.addEventListener("click", () => m?.classList.toggle("hidden"));
+  t?.addEventListener("click", () => {
+    m?.classList.toggle("hidden");
+    m?.classList.toggle("flex");
+  });
 </script>
