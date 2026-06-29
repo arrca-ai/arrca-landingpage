@@ -1,8 +1,140 @@
 ---
-// Hero.astro — eyebrow + headline + subhead.
+// Hero.astro — eyebrow + headline + subhead, over a faint outage-themed backdrop.
+const MONO = "'Geist Mono Variable', monospace";
 ---
-<section class="px-6 pt-24 pb-24 text-center sm:px-10">
-  <div class="mx-auto max-w-[900px]">
+<section class="relative overflow-hidden px-6 pt-24 pb-24 text-center sm:px-10">
+  <!-- decorative outage motifs (very light, behind the text) -->
+  <div class="pointer-events-none absolute inset-0 z-0 hidden md:block" aria-hidden="true">
+    <svg viewBox="0 0 1280 540" preserveAspectRatio="xMidYMid slice" class="h-full w-full" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <defs>
+        <pattern id="dotgrid" width="26" height="26" patternUnits="userSpaceOnUse">
+          <circle cx="1" cy="1" r="1" fill="#14283a" fill-opacity="0.022"></circle>
+        </pattern>
+        <radialGradient id="meshFade" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stop-color="#fff" stop-opacity="0.55"></stop>
+          <stop offset="100%" stop-color="#fff" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+
+      <!-- dashboard texture -->
+      <rect x="0" y="0" width="1280" height="540" fill="url(#dotgrid)"></rect>
+
+      <!-- ============ central service-topology mesh ============ -->
+      <g>
+        <!-- edges -->
+        <path d="M380 160 L468 124 L556 168 L648 126 L732 166 L824 128 L908 172
+                 M380 160 L436 248 M556 168 L560 296 M648 126 L664 244 M732 166 L772 300 M824 128 L884 256
+                 M436 248 L560 296 L664 244 M884 256 L772 300
+                 M436 248 L520 384 M560 296 L520 384 M664 244 L700 392 M884 256 L840 372 L700 392
+                 M556 168 L664 244 M732 166 L664 244"
+              stroke="#14283a" stroke-opacity="0.05" stroke-width="1.3"></path>
+        <!-- broken edges around the failing cluster -->
+        <path d="M664 244 L772 300 M772 300 L700 392" stroke="#b4552f" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="4 4"></path>
+        <!-- nodes -->
+        <g fill="#14283a" fill-opacity="0.06" stroke="none">
+          <circle cx="380" cy="160" r="3.4"></circle>
+          <circle cx="468" cy="124" r="3.4"></circle>
+          <circle cx="556" cy="168" r="3.4"></circle>
+          <circle cx="648" cy="126" r="3.4"></circle>
+          <circle cx="732" cy="166" r="3.4"></circle>
+          <circle cx="824" cy="128" r="3.4"></circle>
+          <circle cx="908" cy="172" r="3.4"></circle>
+          <circle cx="436" cy="248" r="3.4"></circle>
+          <circle cx="664" cy="244" r="3.4"></circle>
+          <circle cx="884" cy="256" r="3.4"></circle>
+          <circle cx="520" cy="384" r="3.4"></circle>
+          <circle cx="700" cy="392" r="3.4"></circle>
+          <circle cx="840" cy="372" r="3.4"></circle>
+        </g>
+        <!-- root node -->
+        <circle cx="560" cy="296" r="5" fill="#14283a" fill-opacity="0.10" stroke="none"></circle>
+        <!-- failing node + pulse -->
+        <circle cx="772" cy="300" r="15" stroke="#b4552f" stroke-opacity="0.05" stroke-width="1.2"></circle>
+        <circle cx="772" cy="300" r="9" stroke="#b4552f" stroke-opacity="0.11" stroke-width="1.4"></circle>
+        <circle cx="772" cy="300" r="4.2" fill="#b4552f" fill-opacity="0.14" stroke="none"></circle>
+      </g>
+
+      <!-- ============ error-rate chart climbing (left) ============ -->
+      <g>
+        <path d="M70 430 H300 M70 200 V430" stroke="#14283a" stroke-opacity="0.06" stroke-width="1.5"></path>
+        <path d="M70 372 H300 M70 314 H300 M70 256 H300" stroke="#14283a" stroke-opacity="0.03" stroke-width="1"></path>
+        <!-- axis ticks -->
+        <path d="M66 372 H70 M66 314 H70 M66 256 H70 M130 430 V434 M195 430 V434 M260 430 V434" stroke="#14283a" stroke-opacity="0.05" stroke-width="1"></path>
+        <!-- SLO threshold -->
+        <path d="M70 286 H300" stroke="#b4552f" stroke-opacity="0.10" stroke-width="1.2" stroke-dasharray="5 5"></path>
+        <!-- climbing error curve -->
+        <path d="M70 420 C 130 418 160 400 195 360 C 225 326 252 272 300 214" stroke="#b4552f" stroke-opacity="0.13" stroke-width="2"></path>
+        <g fill="#b4552f" fill-opacity="0.13" stroke="none">
+          <circle cx="70" cy="420" r="2"></circle>
+          <circle cx="130" cy="408" r="2"></circle>
+          <circle cx="195" cy="360" r="2"></circle>
+          <circle cx="248" cy="288" r="2.3"></circle>
+          <circle cx="300" cy="214" r="2.3"></circle>
+        </g>
+        <!-- breach marker where the curve crosses the threshold -->
+        <circle cx="248" cy="288" r="6" stroke="#b4552f" stroke-opacity="0.12" stroke-width="1.2"></circle>
+        <!-- warning triangle -->
+        <path d="M300 150 L316 182 L284 182 Z" stroke="#b4552f" stroke-opacity="0.14" stroke-width="1.6"></path>
+        <path d="M300 162 V172" stroke="#b4552f" stroke-opacity="0.18" stroke-width="1.6"></path>
+        <circle cx="300" cy="177.5" r="1" fill="#b4552f" fill-opacity="0.22" stroke="none"></circle>
+        <text x="70" y="186" font-family={MONO} font-size="11" fill="#b4552f" fill-opacity="0.18">5xx ↑</text>
+      </g>
+
+      <!-- ============ latency spike + crash (right) ============ -->
+      <g>
+        <path d="M980 320 H1240 M980 200 V360" stroke="#14283a" stroke-opacity="0.06" stroke-width="1.5"></path>
+        <path d="M980 260 H1240" stroke="#14283a" stroke-opacity="0.03" stroke-width="1"></path>
+        <polyline points="980,300 1040,302 1080,298 1110,300 1135,170 1160,300 1195,304 1220,360 1240,360" stroke="#14283a" stroke-opacity="0.09" stroke-width="2"></polyline>
+        <polyline points="1120,300 1135,170 1150,300" stroke="#b4552f" stroke-opacity="0.13" stroke-width="2"></polyline>
+        <!-- peak drop-line -->
+        <path d="M1135 178 V300" stroke="#b4552f" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="3 3"></path>
+        <g fill="#14283a" fill-opacity="0.1" stroke="none">
+          <circle cx="1135" cy="170" r="2.3"></circle>
+          <circle cx="1220" cy="360" r="2"></circle>
+        </g>
+        <text x="1146" y="172" font-family={MONO} font-size="11" fill="#14283a" fill-opacity="0.16">p99</text>
+      </g>
+
+      <!-- ============ incident pulse rings (top-right) ============ -->
+      <g>
+        <circle cx="1178" cy="104" r="10" stroke="#b4552f" stroke-opacity="0.16" stroke-width="1.6"></circle>
+        <circle cx="1178" cy="104" r="22" stroke="#b4552f" stroke-opacity="0.09" stroke-width="1.4"></circle>
+        <circle cx="1178" cy="104" r="34" stroke="#b4552f" stroke-opacity="0.05" stroke-width="1.2"></circle>
+        <!-- radar sweep -->
+        <path d="M1178 104 L1206 86" stroke="#b4552f" stroke-opacity="0.12" stroke-width="1.3"></path>
+        <circle cx="1178" cy="104" r="3" fill="#b4552f" fill-opacity="0.18" stroke="none"></circle>
+      </g>
+
+      <!-- ============ service graph with a broken edge (bottom-left) ============ -->
+      <g>
+        <path d="M110 468 L195 432 M110 468 L175 512 M175 512 L245 520 M195 432 L150 500" stroke="#14283a" stroke-opacity="0.07" stroke-width="1.5"></path>
+        <path d="M195 432 L270 470" stroke="#b4552f" stroke-opacity="0.14" stroke-width="1.6" stroke-dasharray="4 4"></path>
+        <g fill="#14283a" fill-opacity="0.08" stroke="none">
+          <circle cx="110" cy="468" r="4.5"></circle>
+          <circle cx="195" cy="432" r="4.5"></circle>
+          <circle cx="175" cy="512" r="4.5"></circle>
+          <circle cx="245" cy="520" r="4.5"></circle>
+          <circle cx="150" cy="500" r="3.6"></circle>
+        </g>
+        <circle cx="270" cy="470" r="4.5" fill="#b4552f" fill-opacity="0.16" stroke="none"></circle>
+        <circle cx="270" cy="470" r="9" stroke="#b4552f" stroke-opacity="0.12" stroke-width="1.4"></circle>
+      </g>
+
+      <!-- ============ availability declining (bottom-right) ============ -->
+      <g>
+        <path d="M980 430 H1230" stroke="#14283a" stroke-opacity="0.04" stroke-width="1"></path>
+        <polyline points="980,440 1015,438 1050,450 1085,442 1120,470 1155,468 1190,495 1225,502" stroke="#14283a" stroke-opacity="0.08" stroke-width="1.8"></polyline>
+        <g fill="#14283a" fill-opacity="0.09" stroke="none">
+          <circle cx="1085" cy="442" r="1.8"></circle>
+          <circle cx="1155" cy="468" r="1.8"></circle>
+        </g>
+        <circle cx="1225" cy="502" r="2.6" fill="#b4552f" fill-opacity="0.18" stroke="none"></circle>
+        <text x="980" y="424" font-family={MONO} font-size="11" fill="#14283a" fill-opacity="0.14">99.2%</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="relative z-10 mx-auto max-w-[900px]">
     <div class="mb-[26px] font-mono text-[12.5px] tracking-[0.14em] text-accent">arrca · RCA FOR KUBERNETES</div>
     <h1 class="mx-auto mb-5 max-w-[760px] text-[clamp(30px,5vw,42px)] font-semibold leading-[1.18] tracking-[-0.025em] text-ink-900">
       Improve your time to recovery from an outage.
